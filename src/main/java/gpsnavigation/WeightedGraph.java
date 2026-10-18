@@ -116,6 +116,45 @@ public final class WeightedGraph {
         return Collections.unmodifiableMap(snapshot);
     }
 
+    /** BFS ignores weights and minimises the number of road connections. */
+    public BfsResult bfsRoute(String start, String destination) {
+        String source = requireExistingLocation(start);
+        String target = requireExistingLocation(destination);
+        List<String> order = new ArrayList<>();
+        Map<String, String> parent = new LinkedHashMap<>();
+        Map<String, Integer> hops = new LinkedHashMap<>();
+        Deque<String> queue = new ArrayDeque<>();
+
+        parent.put(source, null);
+        hops.put(source, 0);
+        queue.addLast(source);
+        boolean found = source.equals(target);
+
+        while (!queue.isEmpty() && !found) {
+            String current = queue.removeFirst();
+            order.add(current);
+            for (Edge edge : adjacencyList.get(current)) {
+                String neighbour = edge.getDestination();
+                if (!parent.containsKey(neighbour)) {
+                    parent.put(neighbour, current);
+                    hops.put(neighbour, hops.get(current) + 1);
+                    queue.addLast(neighbour);
+                    if (neighbour.equals(target)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (source.equals(target)) {
+            order.add(source);
+        }
+        if (!found) {
+            return new BfsResult(order, Collections.emptyList(), -1);
+        }
+        return new BfsResult(order, buildRoute(parent, target), hops.get(target));
+    }
+
     public double routeDistance(List<String> route) {
         double total = 0.0;
         for (int index = 0; index + 1 < route.size(); index++) {
