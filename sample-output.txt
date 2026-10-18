@@ -1,0 +1,25 @@
+Plain Java test output:
+
+BFS route: [Air Itam, Balik Pulau, Bayan Lepas] | hops=2
+Dijkstra route: [Air Itam, George Town, Gelugor, Bayan Lepas] | distance=23.0 km
+All graph tests passed.
+
+Initial JavaFX network display:
+
+Locations: 17 | Confirmed roads: 22
+
+The graph view displays 17 labelled location nodes and 22 unique undirected road lines. Each line is labelled with its distance in kilometres.
+
+Air Itam -> [Balik Pulau (14 km), George Town (7 km), Tanjung Bungah (9 km)]
+George Town -> [Air Itam (7 km), Butterworth (5 km), Gelugor (7 km), Tanjung Bungah (9 km)]
+
+BFS Traversal Order:
+  [Air Itam, Balik Pulau]
+Route with Fewest Road Connections:
+  [Air Itam, Balik Pulau, Bayan Lepas]
+Number of Road Connections: 2
+Route distance (not optimised by BFS): 30 km
+
+Shortest-Distance Route:
+  [Air Itam, George Town, Gelugor, Bayan Lepas]
+Total Distance: 23 km
