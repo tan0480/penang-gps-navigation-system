@@ -155,6 +155,59 @@ public final class WeightedGraph {
         return new BfsResult(order, buildRoute(parent, target), hops.get(target));
     }
 
+    /** Dijkstra minimises the sum of positive road distances. */
+    public DijkstraResult dijkstraRoute(String start, String destination) {
+        String source = requireExistingLocation(start);
+        String target = requireExistingLocation(destination);
+        if (source.equals(target)) {
+            return new DijkstraResult(Collections.singletonList(source), 0.0,
+                    Collections.singletonList(source));
+        }
+
+        Map<String, Double> distances = new LinkedHashMap<>();
+        Map<String, String> parent = new LinkedHashMap<>();
+        Set<String> processed = new HashSet<>();
+        List<String> visitedLocations = new ArrayList<>();
+        for (String location : adjacencyList.keySet()) {
+            distances.put(location, Double.POSITIVE_INFINITY);
+            parent.put(location, null);
+        }
+        distances.put(source, 0.0);
+
+        IndexedMinPriorityQueue queue = new IndexedMinPriorityQueue();
+        queue.addOrDecrease(source, 0.0);
+        while (!queue.isEmpty()) {
+            IndexedMinPriorityQueue.Entry entry = queue.removeMin();
+            String current = entry.getVertex();
+            if (!processed.add(current)) {
+                continue;
+            }
+            visitedLocations.add(current);
+            if (current.equals(target)) {
+                break;
+            }
+            for (Edge edge : adjacencyList.get(current)) {
+                String neighbour = edge.getDestination();
+                if (processed.contains(neighbour)) {
+                    continue;
+                }
+                double candidate = distances.get(current) + edge.getDistanceKm();
+                if (candidate < distances.get(neighbour)) {
+                    distances.put(neighbour, candidate);
+                    parent.put(neighbour, current);
+                    queue.addOrDecrease(neighbour, candidate);
+                }
+            }
+        }
+
+        if (Double.isInfinite(distances.get(target))) {
+            return new DijkstraResult(Collections.emptyList(), Double.POSITIVE_INFINITY,
+                    visitedLocations);
+        }
+        return new DijkstraResult(buildRoute(parent, target), distances.get(target),
+                visitedLocations);
+    }
+
     public double routeDistance(List<String> route) {
         double total = 0.0;
         for (int index = 0; index + 1 < route.size(); index++) {
